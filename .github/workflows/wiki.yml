@@ -11,10 +11,10 @@ jobs:
       - name: Slack
         run: |
           curl -X POST -H 'Content-type: application/json' \
-            --data "{\"text\": \"Wiki ${ACTION}: ${TITLE}\n${URL}\", \"channel\": \"#rss-slack_update\", \"username\": \"GitHub Wiki更新\", \"icon_emoji\": \":github-purple:\"}" \
+            --data "{\"text\": \"Wiki ${ACTION}: ${TITLE}\n${URL}\", \"channel\": \"#${SLACK_CHANNEL}\", \"username\": \"Wiki更新\", \"icon_emoji\": \":github-purple:\"}" \
             "${{ secrets.SLACK_WEBHOOK_URL }}"
         env:
           ACTION: ${{ github.event.pages[0].action }}
           TITLE: ${{ github.event.pages[0].title }}
           URL: ${{ github.event.pages[0].html_url }}
-
+          SLACK_CHANNEL: ${{ vars.SLACK_CHANNEL }}
