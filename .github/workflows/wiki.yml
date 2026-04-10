@@ -1,7 +1,7 @@
 name: Wiki
 
 on:
-  gollum
+  gollum:
 
 jobs:
   notify:
@@ -10,8 +10,14 @@ jobs:
     steps:
       - name: Slack
         run: |
-          curl -X POST -H 'Content-type: application/json' \
-            --data "{\"text\": \"Wiki ${ACTION}: ${TITLE}\n${URL}\", \"channel\": \"#${SLACK_CHANNEL}\", \"username\": \"Wiki更新\", \"icon_emoji\": \":github-purple:\"}" \
+          payload="$(jq -n \
+            --arg action "$ACTION" \
+            --arg title "$TITLE" \
+            --arg url "$URL" \
+            --arg channel "#$SLACK_CHANNEL" \
+            '{text: ("Wiki " + $action + ": " + $title + "\n" + $url), channel: $channel, username: "Wiki更新", icon_emoji: ":github-purple:"}')"
+          curl --fail-with-body --show-error --silent -X POST -H 'Content-type: application/json' \
+            --data "$payload" \
             "${{ secrets.SLACK_WEBHOOK_URL }}"
         env:
           ACTION: ${{ github.event.pages[0].action }}
